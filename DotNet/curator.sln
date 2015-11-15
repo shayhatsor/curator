@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "curator-client", "curator-client\curator-client.csproj", "{B85D57D6-3662-452B-A8A2-CCFD81AB33E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Curator.Client", "Curator.Client\Curator.Client.csproj", "{B85D57D6-3662-452B-A8A2-CCFD81AB33E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{747552AF-EA40-488E-A415-4F6179BDAA7E}"
+	ProjectSection(SolutionItems) = preProject
+		SolutionVersion.cs = SolutionVersion.cs
+		ZooKeeperCodeRules.ruleset = ZooKeeperCodeRules.ruleset
+		ZooKeeperNetEx.snk = ZooKeeperNetEx.snk
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

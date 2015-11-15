@@ -17,16 +17,21 @@
 // under the License.
 // </summary>
 
-using org.apache.zookeeper;
+using System.Threading.Tasks;
 
 namespace org.apache.curator
 {
     /// <summary>
-    ///     This is needed to differentiate between ConnectionLossException thrown by ZooKeeper
-    ///     and ConnectionLossException thrown by <seealso cref="ConnectionState#checkTimeouts()" />
+    ///     Abstraction for retry policies to sleep
     /// </summary>
-    public class CuratorConnectionLossException : KeeperException.ConnectionLossException
+    public interface RetrySleeper
     {
-        private const long serialVersionUID = 1L;
+        /// <summary>
+        ///     Sleep for the given time
+        /// </summary>
+        /// <param name="time"> time </param>
+        /// <param name="unit"> time unit </param>
+        /// <exception cref="TaskCanceledException"> if the sleep is interrupted </exception>
+        Task sleepFor(long time, TimeUnit unit);
     }
 }

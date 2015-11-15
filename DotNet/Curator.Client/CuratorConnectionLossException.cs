@@ -17,19 +17,15 @@
 // under the License.
 // </summary>
 
+using org.apache.zookeeper;
+
 namespace org.apache.curator
 {
     /// <summary>
-    ///     Abstraction for retry policies to sleep
+    ///     This is needed to differentiate between ConnectionLossException thrown by ZooKeeper
+    ///     and ConnectionLossException thrown by <seealso cref="ConnectionState#checkTimeouts()" />
     /// </summary>
-    public interface RetrySleeper
+    public class CuratorConnectionLossException : KeeperException.ConnectionLossException
     {
-        /// <summary>
-        ///     Sleep for the given time
-        /// </summary>
-        /// <param name="time"> time </param>
-        /// <param name="unit"> time unit </param>
-        /// <exception cref="InterruptedException"> if the sleep is interrupted </exception>
-        void sleepFor(long time, TimeUnit unit);
     }
 }
