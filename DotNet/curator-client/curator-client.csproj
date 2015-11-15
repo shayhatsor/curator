@@ -7,8 +7,8 @@
     <ProjectGuid>{B85D57D6-3662-452B-A8A2-CCFD81AB33E3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>curator_client</RootNamespace>
-    <AssemblyName>curator-client</AssemblyName>
+    <RootNamespace>org.apache.curator</RootNamespace>
+    <AssemblyName>org.apache.curator</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
