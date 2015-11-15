@@ -58,7 +58,6 @@
     <Compile Include="ConnectionState.cs" />
     <Compile Include="CuratorConnectionLossException.cs" />
     <Compile Include="CuratorZookeeperClient.cs" />
-    <Compile Include="_\DateTimeHelperClass.cs" />
     <Compile Include="drivers\TracerDriver.cs" />
     <Compile Include="ensemble\EnsembleProvider.cs" />
     <Compile Include="ensemble\exhibitor\DefaultExhibitorRestClient.cs" />
@@ -79,6 +78,8 @@
     <Compile Include="retry\RetryUntilElapsed.cs" />
     <Compile Include="retry\SleepingRetry.cs" />
     <Compile Include="SessionFailRetryLoop.cs" />
+    <Compile Include="_\Atomic.cs" />
+    <Compile Include="_\Preconditions.cs" />
     <Compile Include="_\StringHelperClass.cs" />
     <Compile Include="TimeTrace.cs" />
     <Compile Include="utils\CloseableExecutorService.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="utils\ThreadUtils.cs" />
     <Compile Include="utils\ZKPaths.cs" />
     <Compile Include="utils\ZookeeperFactory.cs" />
+    <Compile Include="_\TimeUnit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

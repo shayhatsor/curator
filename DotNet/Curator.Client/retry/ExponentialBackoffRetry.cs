@@ -1,4 +1,5 @@
 ﻿using System;
+using org.apache.utils;
 
 // <summary>
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -21,18 +22,14 @@
 
 namespace org.apache.curator.retry
 {
-    using VisibleForTesting = com.google.common.annotations.VisibleForTesting;
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
     /// <summary>
     ///     Retry policy that retries a set number of times with increasing sleep time between retries
     /// </summary>
-    public class ExponentialBackoffRetry : SleepingRetry
+    internal class ExponentialBackoffRetry : SleepingRetry
     {
         private const int MAX_RETRIES_LIMIT = 29;
-        private static readonly Logger log = LoggerFactory.getLogger(typeof (ExponentialBackoffRetry));
-        private static readonly int DEFAULT_MAX_SLEEP_MS = int.MaxValue;
+        private static readonly TraceLogger log = TraceLogger.GetLogger(typeof(ExponentialBackoffRetry));
+        private const int DEFAULT_MAX_SLEEP_MS = int.MaxValue;
         private readonly int baseSleepTimeMs;
         private readonly int maxSleepMs;
 

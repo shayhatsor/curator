@@ -19,8 +19,6 @@
 
 namespace org.apache.curator.ensemble.@fixed
 {
-    using Preconditions = com.google.common.@base.Preconditions;
-
     /// <summary>
     ///     Standard ensemble provider that wraps a fixed connection string
     /// </summary>

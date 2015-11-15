@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using org.apache.curator.utils;
+using org.apache.utils;
 
 // <summary>
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -24,13 +25,6 @@ using org.apache.curator.utils;
 
 namespace org.apache.curator.ensemble.exhibitor
 {
-    using VisibleForTesting = com.google.common.annotations.VisibleForTesting;
-    using Preconditions = com.google.common.@base.Preconditions;
-    using Lists = com.google.common.collect.Lists;
-    using Maps = com.google.common.collect.Maps;
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
     /// <summary>
     ///     Ensemble provider that polls a cluster of Exhibitor (https://github.com/Netflix/exhibitor)
     ///     instances for the connection string.
@@ -46,7 +40,7 @@ namespace org.apache.curator.ensemble.exhibitor
         private const string VALUE_SERVER_PREFIX = "server";
         private readonly AtomicReference<string> connectionString = new AtomicReference<string>("");
         private readonly AtomicReference<Exhibitors> exhibitors = new AtomicReference<Exhibitors>();
-        private readonly Logger log = LoggerFactory.getLogger(this.GetType());
+        private static readonly TraceLogger log = TraceLogger.GetLogger(typeof(ExhibitorEnsembleProvider));
         private readonly AtomicReference<Exhibitors> masterExhibitors = new AtomicReference<Exhibitors>();
         private readonly int pollingMs;
         private readonly Random random = new Random();
@@ -258,7 +252,7 @@ namespace org.apache.curator.ensemble.exhibitor
         {
             var values = newValues();
 
-            var start = DateTimeHelperClass.CurrentUnixTimeMillis();
+            var start = TimeHelper.ElapsedMiliseconds;
             var retries = 0;
             var done = false;
             while (!done)
@@ -280,7 +274,7 @@ namespace org.apache.curator.ensemble.exhibitor
                     }
                     catch (Exception e)
                     {
-                        if (retryPolicy.allowRetry(retries++, DateTimeHelperClass.CurrentUnixTimeMillis() - start,
+                        if (retryPolicy.allowRetry(retries++, TimeHelper.ElapsedMiliseconds - start,
                             RetryLoop.getDefaultRetrySleeper()))
                         {
                             log.warn("Couldn't get servers from Exhibitor. Retrying.", e);

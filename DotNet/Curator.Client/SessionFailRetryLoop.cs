@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using org.apache.zookeeper;
 
 // <summary>
@@ -24,10 +25,6 @@ using org.apache.zookeeper;
 
 namespace org.apache.curator
 {
-    using Preconditions = com.google.common.@base.Preconditions;
-    using Maps = com.google.common.collect.Maps;
-    using Sets = com.google.common.collect.Sets;
-
     /// <summary>
     ///     <para>
     ///         See <seealso cref="RetryLoop" /> for the main details on retry loops.
@@ -65,10 +62,9 @@ namespace org.apache.curator
     ///         The SessionFailRetryLoop prevents this type of scenario. When a session failure is detected,
     ///         the thread is marked as failed which will cause all future Curator operations to fail. The
     ///         SessionFailRetryLoop will then either retry the entire
-    ///         set of operations or fail (depending on <seealso cref="SessionFailRetryLoop.Mode" />)
+    ///         set of operations or fail (depending on <seealso cref="Mode" />)
     ///     </para>
     ///     Canonical usage:
-    ///     <br>
     ///         <pre>
     ///             SessionFailRetryLoop    retryLoop = client.newSessionFailRetryLoop(mode);
     ///             retryLoop.start();
@@ -247,7 +243,7 @@ namespace org.apache.curator
 
         private class WatcherAnonymousInnerClassHelper : Watcher
         {
-            public override void process(WatchedEvent @event)
+            public override Task process(WatchedEvent @event)
             {
                 if (@event.getState() == Event.KeeperState.Expired)
                 {
@@ -259,7 +255,6 @@ namespace org.apache.curator
 
         public class SessionFailedException : Exception
         {
-            internal const long serialVersionUID = 1L;
         }
     }
 }

@@ -18,6 +18,7 @@
 // </summary>
 
 using org.apache.curator.drivers;
+using org.apache.utils;
 
 namespace org.apache.curator
 {
@@ -28,7 +29,7 @@ namespace org.apache.curator
     {
         private readonly TracerDriver driver;
         private readonly string name;
-        private readonly long startTimeNanos = System.nanoTime();
+        private readonly long startTimeNanos = TimeHelper.ElapsedNanoseconds;
 
         /// <summary>
         ///     Create and start a timer
@@ -46,7 +47,7 @@ namespace org.apache.curator
         /// </summary>
         public virtual void commit()
         {
-            var elapsed = System.nanoTime() - startTimeNanos;
+            var elapsed = TimeHelper.ElapsedNanoseconds - startTimeNanos;
             driver.addTrace(name, elapsed, TimeUnit.NANOSECONDS);
         }
     }

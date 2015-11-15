@@ -18,7 +18,6 @@
 // </summary>
 
 
-using System;
 using System.IO;
 using org.apache.zookeeper;
 
@@ -27,7 +26,7 @@ namespace org.apache.curator.ensemble
     /// <summary>
     ///     Abstraction that provides the ZooKeeper connection string
     /// </summary>
-    public interface EnsembleProvider : IDisposable
+    public interface EnsembleProvider
     {
         /// <summary>
         ///     Curator will call this method when <seealso cref="CuratorZookeeperClient#start()" /> is

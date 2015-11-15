@@ -20,8 +20,6 @@
 
 namespace org.apache.curator.utils
 {
-    using Preconditions = com.google.common.@base.Preconditions;
-
     /// <summary>
     ///     Decoration on an ScheduledExecutorService that tracks created futures and provides
     ///     a method to close futures created via this class
@@ -49,7 +47,7 @@ namespace org.apache.curator.utils
         {
             Preconditions.checkState(isOpen.get(), "CloseableExecutorService is closed");
 
-            InternalFutureTask<Void> futureTask = new InternalFutureTask<Void>(new FutureTask<Void>(task, null));
+            InternalFutureTask<void> futureTask = new InternalFutureTask<void>(new FutureTask<void>(task, null));
             scheduledExecutorService.schedule(futureTask, delay, unit);
             return futureTask;
         }

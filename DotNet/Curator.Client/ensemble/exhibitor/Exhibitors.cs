@@ -21,9 +21,6 @@
 
 namespace org.apache.curator.ensemble.exhibitor
 {
-    using Preconditions = com.google.common.@base.Preconditions;
-    using ImmutableList = com.google.common.collect.ImmutableList;
-
     /// <summary>
     ///     POJO for specifying the cluster of Exhibitor instances
     /// </summary>
@@ -44,7 +41,7 @@ namespace org.apache.curator.ensemble.exhibitor
         {
             this.backupConnectionStringProvider = Preconditions.checkNotNull(backupConnectionStringProvider,
                 "backupConnectionStringProvider cannot be null");
-            this.hostnames = ImmutableList.copyOf(hostnames);
+            this.hostnames = new List<string>(hostnames);
             this.restPort = restPort;
         }
 

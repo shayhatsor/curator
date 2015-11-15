@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using org.apache.utils;
 using org.apache.zookeeper;
 using org.apache.zookeeper.data;
 
@@ -25,11 +27,6 @@ using org.apache.zookeeper.data;
 
 namespace org.apache.curator.utils
 {
-    using Splitter = com.google.common.@base.Splitter;
-    using Lists = com.google.common.collect.Lists;
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
     public class ZKPaths
     {
         /// <summary>
@@ -208,7 +205,7 @@ namespace org.apache.curator.utils
         /// <exception cref="org.apache.zookeeper.KeeperException"> Zookeeper errors </exception>
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: public static void mkdirs(org.apache.zookeeper.ZooKeeper zookeeper, String path, boolean makeLastNode, InternalACLProvider aclProvider, boolean asContainers) throws InterruptedException, org.apache.zookeeper.KeeperException
-        public static void mkdirs(ZooKeeper zookeeper, string path, bool makeLastNode, InternalACLProvider aclProvider,
+        public static async void mkdirs(ZooKeeper zookeeper, string path, bool makeLastNode, InternalACLProvider aclProvider,
             bool asContainers)
         {
             PathUtils.validatePath(path);
@@ -231,11 +228,11 @@ namespace org.apache.curator.utils
                 }
 
                 var subPath = path.Substring(0, pos);
-                if (zookeeper.exists(subPath, false) == null)
+                if ((await zookeeper.existsAsync(subPath, false) )== null)
                 {
                     try
                     {
-                        IList<ACL> acl = null;
+                        List<ACL> acl = null;
                         if (aclProvider != null)
                         {
                             acl = aclProvider.getAclForPath(path);
@@ -248,7 +245,7 @@ namespace org.apache.curator.utils
                         {
                             acl = ZooDefs.Ids.OPEN_ACL_UNSAFE;
                         }
-                        zookeeper.create(subPath, new sbyte[0], acl, getCreateMode(asContainers));
+                        await zookeeper.createAsync(subPath, new byte[0], acl, getCreateMode(asContainers));
                     }
                     catch (KeeperException.NodeExistsException)
                     {
@@ -268,27 +265,27 @@ namespace org.apache.curator.utils
         /// <exception cref="KeeperException"> </exception>
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: public static void deleteChildren(org.apache.zookeeper.ZooKeeper zookeeper, String path, boolean deleteSelf) throws InterruptedException, org.apache.zookeeper.KeeperException
-        public static void deleteChildren(ZooKeeper zookeeper, string path, bool deleteSelf)
+        public static async Task deleteChildren(ZooKeeper zookeeper, string path, bool deleteSelf)
         {
             PathUtils.validatePath(path);
 
-            IList<string> children = zookeeper.getChildren(path, null);
+            IList<string> children = (await zookeeper.getChildrenAsync(path, null)).Children;
             foreach (var child in children)
             {
                 var fullPath = makePath(path, child);
-                deleteChildren(zookeeper, fullPath, true);
+                await deleteChildren(zookeeper, fullPath, true);
             }
 
             if (deleteSelf)
             {
                 try
                 {
-                    zookeeper.delete(path, -1);
+                    await zookeeper.deleteAsync(path, -1);
                 }
                 catch (KeeperException.NotEmptyException)
                 {
                     //someone has created a new child since we checked ... delete again.
-                    deleteChildren(zookeeper, path, true);
+                    await deleteChildren(zookeeper, path, true);
                 }
                 catch (KeeperException.NoNodeException)
                 {
@@ -307,10 +304,10 @@ namespace org.apache.curator.utils
         /// <exception cref="org.apache.zookeeper.KeeperException"> zookeeper errors </exception>
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: public static java.util.List<String> getSortedChildren(org.apache.zookeeper.ZooKeeper zookeeper, String path) throws InterruptedException, org.apache.zookeeper.KeeperException
-        public static IList<string> getSortedChildren(ZooKeeper zookeeper, string path)
+        public static async Task<IList<string>> getSortedChildren(ZooKeeper zookeeper, string path)
         {
-            IList<string> children = zookeeper.getChildren(path, false);
-            IList<string> sortedList = Lists.newArrayList(children);
+            IList<string> children = (await zookeeper.getChildrenAsync(path, false)).Children;
+            var sortedList = new List<string>(children);
             sortedList.Sort();
             return sortedList;
         }
@@ -414,24 +411,9 @@ namespace org.apache.curator.utils
 
         private class CreateModeHolder
         {
-            internal static readonly Logger log = LoggerFactory.getLogger(typeof (ZKPaths));
-            internal static readonly CreateMode containerCreateMode;
-
-            static CreateModeHolder()
-            {
-                CreateMode localCreateMode;
-                try
-                {
-                    localCreateMode = CreateMode.valueOf("CONTAINER");
-                }
-                catch (ArgumentException)
-                {
-                    localCreateMode = NON_CONTAINER_MODE;
-                    log.warn(
-                        "The version of ZooKeeper being used doesn't support Container nodes. CreateMode.PERSISTENT will be used instead.");
-                }
-                containerCreateMode = localCreateMode;
-            }
+            private static readonly TraceLogger log = TraceLogger.GetLogger(typeof(ZKPaths));
+            internal static readonly CreateMode containerCreateMode = NON_CONTAINER_MODE;
+            
         }
 
         public class PathAndNode

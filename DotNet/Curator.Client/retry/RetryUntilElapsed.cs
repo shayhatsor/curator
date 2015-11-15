@@ -22,7 +22,7 @@ namespace org.apache.curator.retry
     /// <summary>
     ///     A retry policy that retries until a given amount of time elapses
     /// </summary>
-    public class RetryUntilElapsed : SleepingRetry
+    internal class RetryUntilElapsed : SleepingRetry
     {
         private readonly int maxElapsedTimeMs;
         private readonly int sleepMsBetweenRetries;

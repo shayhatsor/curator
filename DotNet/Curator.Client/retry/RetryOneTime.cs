@@ -22,7 +22,7 @@ namespace org.apache.curator.retry
     /// <summary>
     ///     A retry policy that retries only once
     /// </summary>
-    public class RetryOneTime : RetryNTimes
+    internal class RetryOneTime : RetryNTimes
     {
         public RetryOneTime(int sleepMsBetweenRetry) : base(1, sleepMsBetweenRetry)
         {

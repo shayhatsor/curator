@@ -17,6 +17,8 @@
 // under the License.
 // </summary>
 
+using System.Threading.Tasks;
+
 namespace org.apache.curator
 {
     /// <summary>
@@ -32,6 +34,6 @@ namespace org.apache.curator
         /// <param name="elapsedTimeMs"> the elapsed time in ms since the operation was attempted </param>
         /// <param name="sleeper"> use this to sleep - DO NOT call Thread.sleep </param>
         /// <returns> true/false </returns>
-        bool allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper);
+        Task<bool> allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper);
     }
 }

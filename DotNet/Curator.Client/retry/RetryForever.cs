@@ -1,4 +1,6 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
+using org.apache.utils;
 
 // <summary>
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -21,40 +23,23 @@
 
 namespace org.apache.curator.retry
 {
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
-//JAVA TO C# CONVERTER TODO TASK: This Java 'import static' statement cannot be converted to C#:
-//	import static com.google.common.@base.Preconditions.checkArgument;
-
     /// <summary>
     ///     <seealso cref="RetryPolicy" /> implementation that always <i>allowsRetry</i>.
     /// </summary>
     public class RetryForever : RetryPolicy
     {
-        private static readonly Logger log = LoggerFactory.getLogger(typeof (RetryForever));
-
         private readonly int retryIntervalMs;
 
         public RetryForever(int retryIntervalMs)
         {
-            checkArgument(retryIntervalMs > 0);
+            Preconditions.checkArgument(retryIntervalMs > 0);
             this.retryIntervalMs = retryIntervalMs;
         }
 
-        public virtual bool allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper)
+        public virtual async Task<bool> allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper)
         {
-            try
-            {
-                sleeper.sleepFor(retryIntervalMs, TimeUnit.MILLISECONDS);
-            }
-            catch (InterruptedException e)
-            {
-                Thread.CurrentThread.Interrupt();
-                log.warn("Error occurred while sleeping", e);
-                return false;
-            }
-            return true;
+                await sleeper.sleepFor(retryIntervalMs, TimeUnit.MILLISECONDS);
+                return true;
         }
     }
 }

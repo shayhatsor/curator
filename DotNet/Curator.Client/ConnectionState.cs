@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using org.apache.curator.drivers;
 using org.apache.curator.ensemble;
 using org.apache.curator.utils;
+using org.apache.utils;
 using org.apache.zookeeper;
 
 // <summary>
@@ -26,14 +29,11 @@ using org.apache.zookeeper;
 
 namespace org.apache.curator
 {
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
-    internal class ConnectionState : Watcher, IDisposable
+    internal class ConnectionState : Watcher
     {
         private const int MAX_BACKGROUND_EXCEPTIONS = 10;
         private static readonly bool LOG_EVENTS = bool.getBoolean(DebugUtils.PROPERTY_LOG_EVENTS);
-        private static readonly Logger log = LoggerFactory.getLogger(typeof (ConnectionState));
+        private static readonly TraceLogger log = TraceLogger.GetLogger(typeof(ConnectionState));
         private readonly LinkedList<Exception> backgroundExceptions = new ConcurrentLinkedQueue<Exception>();
         private readonly int connectionTimeoutMs;
         private readonly EnsembleProvider ensembleProvider;
@@ -43,7 +43,7 @@ namespace org.apache.curator
         private readonly int sessionTimeoutMs;
         private readonly AtomicReference<TracerDriver> tracer;
         private readonly HandleHolder zooKeeper;
-        private volatile long connectionStartMs;
+        private AtomicLong connectionStartMs = new AtomicLong();
 
         internal ConnectionState(ZookeeperFactory zookeeperFactory, EnsembleProvider ensembleProvider,
             int sessionTimeoutMs, int connectionTimeoutMs, Watcher parentWatcher, AtomicReference<TracerDriver> tracer,
@@ -63,7 +63,7 @@ namespace org.apache.curator
 
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: @Override public void close() throws java.io.IOException
-        public virtual void Dispose()
+        public virtual void close()
         {
             log.debug("Closing");
 
@@ -74,7 +74,7 @@ namespace org.apache.curator
             }
             catch (Exception e)
             {
-                throw new IOException(e);
+                throw new IOException(e.Message, e);
             }
             finally
             {
@@ -137,21 +137,21 @@ namespace org.apache.curator
             return instanceIndex.get();
         }
 
-        public override void process(WatchedEvent @event)
+        public override Task process(WatchedEvent @event)
         {
             if (LOG_EVENTS)
             {
                 log.debug("ConnectState watcher: " + @event);
             }
 
-            if (@event.getType() == Event.EventType.None)
+            if (@event.get_Type() == Event.EventType.None)
             {
                 bool wasConnected = isConnected_Renamed.get();
                 var newIsConnected = checkState(@event.getState(), wasConnected);
                 if (newIsConnected != wasConnected)
                 {
                     isConnected_Renamed.set(newIsConnected);
-                    connectionStartMs = DateTimeHelperClass.CurrentUnixTimeMillis();
+                    connectionStartMs.Value = TimeHelper.ElapsedMiliseconds;
                 }
             }
 
@@ -175,7 +175,7 @@ namespace org.apache.curator
             lock (this)
             {
                 var minTimeout = Math.Min(sessionTimeoutMs, connectionTimeoutMs);
-                var elapsed = DateTimeHelperClass.CurrentUnixTimeMillis() - connectionStartMs;
+                var elapsed = TimeHelper.ElapsedMiliseconds - connectionStartMs.get();
                 if (elapsed >= minTimeout)
                 {
                     if (zooKeeper.hasNewConnectionString())
@@ -227,7 +227,7 @@ namespace org.apache.curator
                 instanceIndex.incrementAndGet();
 
                 isConnected_Renamed.set(false);
-                connectionStartMs = DateTimeHelperClass.CurrentUnixTimeMillis();
+                connectionStartMs.Value = TimeHelper.ElapsedMiliseconds;
                 zooKeeper.closeAndReset();
                 zooKeeper.getZooKeeper(); // initiate connection
             }
@@ -240,38 +240,31 @@ namespace org.apache.curator
             switch (state)
             {
                 default:
-                    goto case Disconnected;
-                case Disconnected:
+                case Event.KeeperState.Disconnected:
                 {
                     isConnected = false;
                     break;
                 }
 
-                case SyncConnected:
-                case ConnectedReadOnly:
+                case Event.KeeperState.SyncConnected:
+                case Event.KeeperState.ConnectedReadOnly:
                 {
                     isConnected = true;
                     break;
                 }
 
-                case AuthFailed:
+                case Event.KeeperState.AuthFailed:
                 {
                     isConnected = false;
                     log.error("Authentication failed");
                     break;
                 }
 
-                case Expired:
+                case Event.KeeperState.Expired:
                 {
                     isConnected = false;
                     checkNewConnectionString = false;
                     handleExpiredSession();
-                    break;
-                }
-
-                case SaslAuthenticated:
-                {
-                    // NOP
                     break;
                 }
             }

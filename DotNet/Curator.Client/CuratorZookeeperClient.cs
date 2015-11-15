@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using org.apache.curator.drivers;
 using org.apache.curator.ensemble;
 using org.apache.curator.ensemble.@fixed;
 using org.apache.curator.utils;
+using org.apache.utils;
 using org.apache.zookeeper;
 
 // <summary>
@@ -26,19 +28,13 @@ using org.apache.zookeeper;
 
 namespace org.apache.curator
 {
-    using Preconditions = com.google.common.@base.Preconditions;
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
     /// <summary>
     ///     A wrapper around Zookeeper that takes care of some low-level housekeeping
     /// </summary>
-//JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
-//ORIGINAL LINE: @SuppressWarnings("UnusedDeclaration") public class CuratorZookeeperClient implements java.io.Closeable
     public class CuratorZookeeperClient : IDisposable
     {
         private readonly int connectionTimeoutMs;
-        private readonly Logger log = LoggerFactory.getLogger(this.GetType());
+        private static readonly TraceLogger log = TraceLogger.GetLogger(typeof (CuratorZookeeperClient));
         private readonly AtomicReference<RetryPolicy> retryPolicy = new AtomicReference<RetryPolicy>();
         private readonly AtomicBoolean started = new AtomicBoolean(false);
         private readonly ConnectionState state;
@@ -307,7 +303,7 @@ namespace org.apache.curator
                 Watcher tempWatcher = new WatcherAnonymousInnerClassHelper(this, latch);
 
                 state.addParentWatcher(tempWatcher);
-                var startTimeMs = DateTimeHelperClass.CurrentUnixTimeMillis();
+                var startTimeMs = TimeHelper.ElapsedMiliseconds;
                 try
                 {
                     latch.@await(1, TimeUnit.SECONDS);
@@ -316,7 +312,7 @@ namespace org.apache.curator
                 {
                     state.removeParentWatcher(tempWatcher);
                 }
-                var elapsed = Math.Max(1, DateTimeHelperClass.CurrentUnixTimeMillis() - startTimeMs);
+                var elapsed = Math.Max(1, TimeHelper.ElapsedMiliseconds - startTimeMs);
                 waitTimeMs -= elapsed;
             }
         }

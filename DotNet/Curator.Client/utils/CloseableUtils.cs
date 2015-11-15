@@ -19,13 +19,10 @@
 
 
 using System;
+using System.IO;
 
 namespace org.apache.curator.utils
 {
-    using Closeables = com.google.common.io.Closeables;
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
     /// <summary>
     ///     This class adds back functionality that was removed in Guava v16.0.
     /// </summary>

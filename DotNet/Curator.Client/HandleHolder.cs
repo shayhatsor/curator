@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using org.apache.curator.ensemble;
 using org.apache.curator.utils;
 using org.apache.zookeeper;
@@ -84,23 +85,17 @@ namespace org.apache.curator
 
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: private void internalClose() throws Exception
-        private void internalClose()
+        private Task internalClose()
         {
-            try
-            {
                 var zooKeeper = helper != null ? helper.getZooKeeper() : null;
                 if (zooKeeper != null)
                 {
                     Watcher dummyWatcher = new WatcherAnonymousInnerClassHelper(this);
                     zooKeeper.register(dummyWatcher);
                         // clear the default watcher so that no new events get processed by mistake
-                    zooKeeper.close();
+                    return zooKeeper.closeAsync();
                 }
-            }
-            catch (InterruptedException)
-            {
-                Thread.CurrentThread.Interrupt();
-            }
+            return Task.FromResult(0);
         }
 
         private interface Helper
@@ -182,7 +177,7 @@ namespace org.apache.curator
                 this.outerInstance = outerInstance;
             }
 
-            public override void process(WatchedEvent @event)
+            public override Task process(WatchedEvent @event)
             {
             }
         }

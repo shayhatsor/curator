@@ -29,13 +29,13 @@ namespace org.apache.curator.utils
         ///     Return the ACL list to use by default (usually <seealso cref="ZooDefs.Ids#OPEN_ACL_UNSAFE" />).
         /// </summary>
         /// <returns> default ACL list </returns>
-        IList<ACL> getDefaultAcl();
+        List<ACL> getDefaultAcl();
 
         /// <summary>
         ///     Return the ACL list to use for the given path
         /// </summary>
         /// <param name="path"> path (NOTE: might be null) </param>
         /// <returns> ACL list </returns>
-        IList<ACL> getAclForPath(string path);
+        List<ACL> getAclForPath(string path);
     }
 }

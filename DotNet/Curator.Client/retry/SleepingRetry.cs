@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 
 // <summary>
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -30,19 +31,11 @@ namespace org.apache.curator.retry
             this.n = n;
         }
 
-        public virtual bool allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper)
+        public virtual async Task<bool> allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper)
         {
             if (retryCount < n)
             {
-                try
-                {
-                    sleeper.sleepFor(getSleepTimeMs(retryCount, elapsedTimeMs), TimeUnit.MILLISECONDS);
-                }
-                catch (InterruptedException)
-                {
-                    Thread.CurrentThread.Interrupt();
-                    return false;
-                }
+                await sleeper.sleepFor(getSleepTimeMs(retryCount, elapsedTimeMs), TimeUnit.MILLISECONDS);
                 return true;
             }
             return false;

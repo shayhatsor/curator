@@ -29,7 +29,6 @@ namespace org.apache.curator.ensemble.exhibitor
         /// <param name="uriPath"> path </param>
         /// <param name="mimeType"> Accept mime type </param>
         /// <returns> raw result </returns>
-        /// <exception cref="Exception"> errors </exception>
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: public String getRaw(String hostname, int port, String uriPath, String mimeType) throws Exception;
         string getRaw(string hostname, int port, string uriPath, string mimeType);

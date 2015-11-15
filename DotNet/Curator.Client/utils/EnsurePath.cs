@@ -68,7 +68,7 @@ namespace org.apache.curator.utils
         {
         }
 
-        protected internal EnsurePath(string path, AtomicReference<Helper> helper, bool makeLastNode,
+        internal EnsurePath(string path, AtomicReference<Helper> helper, bool makeLastNode,
             InternalACLProvider aclProvider)
         {
             this.path = path;

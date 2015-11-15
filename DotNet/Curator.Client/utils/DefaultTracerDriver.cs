@@ -18,18 +18,17 @@
 // </summary>
 
 using org.apache.curator.drivers;
+using org.apache.utils;
 
 namespace org.apache.curator.utils
 {
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
 
     /// <summary>
     ///     Default tracer driver
     /// </summary>
-    public class DefaultTracerDriver : TracerDriver
+    internal class DefaultTracerDriver : TracerDriver
     {
-        private readonly Logger log = LoggerFactory.getLogger(this.GetType());
+        private static readonly TraceLogger log = TraceLogger.GetLogger(typeof(DefaultTracerDriver));
 
         public virtual void addTrace(string name, long time, TimeUnit unit)
         {

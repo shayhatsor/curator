@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using org.apache.curator.drivers;
 using org.apache.curator.utils;
+using org.apache.utils;
 using org.apache.zookeeper;
 
 // <summary>
@@ -24,8 +26,6 @@ using org.apache.zookeeper;
 
 namespace org.apache.curator
 {
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
 
     /// <summary>
     ///     <para>
@@ -61,9 +61,9 @@ namespace org.apache.curator
     {
         private static readonly RetrySleeper sleeper = new RetrySleeperAnonymousInnerClassHelper();
 
-        private readonly Logger log = LoggerFactory.getLogger(this.GetType());
+        private static readonly TraceLogger log = TraceLogger.GetLogger(typeof (RetryLoop));
         private readonly RetryPolicy retryPolicy;
-        private readonly long startTimeMs = DateTimeHelperClass.CurrentUnixTimeMillis();
+        private readonly long startTimeMs = TimeHelper.ElapsedMiliseconds;
         private readonly AtomicReference<TracerDriver> tracer;
         private bool isDone;
         private int retryCount;
@@ -140,10 +140,10 @@ namespace org.apache.curator
         /// <returns> true/false </returns>
         public static bool shouldRetry(int rc)
         {
-            return (rc == KeeperException.Code.CONNECTIONLOSS.intValue()) ||
-                   (rc == KeeperException.Code.OPERATIONTIMEOUT.intValue()) ||
-                   (rc == KeeperException.Code.SESSIONMOVED.intValue()) ||
-                   (rc == KeeperException.Code.SESSIONEXPIRED.intValue());
+            return (rc == (int) KeeperException.Code.CONNECTIONLOSS) ||
+                   (rc == (int) KeeperException.Code.OPERATIONTIMEOUT) ||
+                   (rc == (int) KeeperException.Code.SESSIONMOVED) ||
+                   (rc == (int) KeeperException.Code.SESSIONEXPIRED);
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace org.apache.curator
             if (exception is KeeperException)
             {
                 var keeperException = (KeeperException) exception;
-                return shouldRetry(keeperException.code().intValue());
+                return shouldRetry((int) keeperException.getCode());
             }
             return false;
         }
@@ -168,7 +168,7 @@ namespace org.apache.curator
         /// <exception cref="Exception"> if not retry-able or the retry policy returned negative </exception>
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: public void takeException(Exception exception) throws Exception
-        public virtual void takeException(Exception exception)
+        public virtual async Task takeException(Exception exception)
         {
             var rethrow = true;
             if (isRetryException(exception))
@@ -178,7 +178,7 @@ namespace org.apache.curator
                     log.debug("Retry-able exception received", exception);
                 }
 
-                if (retryPolicy.allowRetry(retryCount++, DateTimeHelperClass.CurrentUnixTimeMillis() - startTimeMs,
+                if (await retryPolicy.allowRetry(retryCount++, TimeHelper.ElapsedMiliseconds - startTimeMs,
                     sleeper))
                 {
                     tracer.get().addCount("retries-allowed", 1);
@@ -208,9 +208,9 @@ namespace org.apache.curator
         {
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
 //ORIGINAL LINE: public void sleepFor(long time, java.util.concurrent.TimeUnit unit) throws InterruptedException
-            public virtual void sleepFor(long time, TimeUnit unit)
+            public virtual Task sleepFor(long time, TimeUnit unit)
             {
-                unit.sleep(time);
+                return Task.Delay(TimeSpan.FromMilliseconds(time));
             }
         }
     }

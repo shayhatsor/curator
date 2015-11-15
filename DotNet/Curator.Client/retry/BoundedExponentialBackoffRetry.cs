@@ -21,8 +21,6 @@
 
 namespace org.apache.curator.retry
 {
-    using VisibleForTesting = com.google.common.annotations.VisibleForTesting;
-
     /// <summary>
     ///     Retry policy that retries a set number of times with an increasing (up to a maximum bound) sleep time between
     ///     retries

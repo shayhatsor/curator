@@ -22,13 +22,6 @@ using System.Collections.Generic;
 
 namespace org.apache.curator.utils
 {
-    using VisibleForTesting = com.google.common.annotations.VisibleForTesting;
-    using Preconditions = com.google.common.@base.Preconditions;
-    using Maps = com.google.common.collect.Maps;
-    using Sets = com.google.common.collect.Sets;
-    using Logger = org.slf4j.Logger;
-    using LoggerFactory = org.slf4j.LoggerFactory;
-
     /// <summary>
     ///     Decoration on an ExecutorService that tracks created futures and provides
     ///     a method to close futures created via this class
@@ -57,7 +50,7 @@ namespace org.apache.curator.utils
         {
             Preconditions.checkState(isOpen.get(), "CloseableExecutorService is closed");
 
-            InternalFutureTask<Void> futureTask = new InternalFutureTask<Void>(new FutureTask<Void>(task, null));
+            InternalFutureTask<void> futureTask = new InternalFutureTask<void>(new FutureTask<void>(task, null));
             executorService.execute(futureTask);
             return futureTask;
         }
@@ -148,7 +141,7 @@ namespace org.apache.curator.utils
 
     >
 
-        protected internal class InternalScheduledFutureTask : Future<Void>
+        protected internal class InternalScheduledFutureTask : Future<void>
         {
             private readonly CloseableExecutorService outerInstance;
             private CloseableExecutorService outerInstance
@@ -185,15 +178,15 @@ namespace org.apache.curator.utils
             }
 
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-//ORIGINAL LINE: @Override public Void get() throws InterruptedException, ExecutionException
-            public override Void get()
+//ORIGINAL LINE: @Override public void get() throws InterruptedException, ExecutionException
+            public override void get()
             {
                 return null;
             }
 
 //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-//ORIGINAL LINE: @Override public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
-            public override Void get(long timeout, TimeUnit unit)
+//ORIGINAL LINE: @Override public void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
+            public override void get(long timeout, TimeUnit unit)
             {
                 return null;
             }
